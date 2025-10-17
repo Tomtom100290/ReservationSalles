@@ -1,0 +1,36 @@
+name: DockerProject Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v2
+
+      - name: Installation des dépendances
+        run: |
+          cd backend
+          npm install
+
+      - name: Exécution des tests
+        run: |
+          cd backend
+          npm test
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Téléchargement des résultats de tests
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results
+
+      - name: Déploiement sur le serveur de production
+        run: |
+          echo "Déploiement de l'application sur le serveur de production."

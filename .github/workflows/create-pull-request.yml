@@ -1,0 +1,26 @@
+name: Création de Pull Request
+
+on:
+  push:
+    branches:
+      - feature/*
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v2
+
+      - name: Installation de La CLI GitHub
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg arch=all] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list
+          apt update
+          apt install gh
+
+      - name: Création de la Pull Request
+        run: |
+          gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+          gh pr create --base main --head ${{ github.ref }} --title "Nouvelle fonctionnalité" --body "Cette pull request ajoute une nouvelle fonctionnalité."
