@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réservation de Salles</title>
+    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .reservations-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .reservation-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .reservation-card:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .reservation-info {
+            flex: 1;
+        }
+
+        .reservation-salle {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .reservation-details {
+            color: #666;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fa-solid fa-house-user"></i> Réservation de Salles</h1>
+            <p class="subtitle">Système de gestion avec Docker Multi-conteneurs</p>
+        </header>
+
+        <div class="content">
+            <div id="status" class="status"></div>
+
+            <div class="form-section">
+                <h2><i class="fa-solid fa-plus"></i> Nouvelle Réservation</h2>
+                <form id="reservationForm">
+                    <div class="form-grid">
+                        <div>
+                            <label>Salle</label>
+                            <select id="salle" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="Salle Mafate">Mafate</option>
+                                <option value="Salle Salazie">Niagara</option>
+                                <option value="Salle Niagara">Salazi</option>
+                                <option value="Salle Cimendef">Cimendef</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Nom du réservant</label>
+                            <input type="text" id="nom" required placeholder="Jean Dupont">
+                        </div>
+                        <div>
+                            <label>Date</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div>
+                            <label>Heure</label>
+                            <select id="heure" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit">Réserver</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2>📋 Réservations actuelles</h2>
+                <div id="reservationsList" class="reservations-list">
+                    <div class="empty-state">Chargement...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Charger les réservations
+        async function loadReservations() {
+            try {
+                const response = await fetch(`${API_URL}/reservations`);
+                const reservations = await response.json();
+
+                const list = document.getElementById('reservationsList');
+
+                if (reservations.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Aucune réservation pour le moment</div>';
+                    return;
+                }
+
+                list.innerHTML = reservations.map(r => `
+                    <div class="reservation-card">
+                        <div class="reservation-info">
+                            <div class="reservation-salle">${r.salle}</div>
+                            <div class="reservation-details">
+                                <span>👤 ${r.nom}</span>
+                                <span>📅 ${new Date(r.date).toLocaleDateString('fr-FR')}</span>
+                                <span>🕐 ${r.heure}</span>
+                            </div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteReservation(${r.id})">Supprimer</button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                showStatus('Erreur de connexion au backend', 'error');
+            }
+        }
+
+        // Ajouter une réservation
+        document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                salle: document.getElementById('salle').value,
+                nom: document.getElementById('nom').value,
+                date: document.getElementById('date').value,
+                heure: document.getElementById('heure').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/reservations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Réservation ajoutée avec succès !', 'success');
+                    e.target.reset();
+                    loadReservations();
+                }
+            } catch (err) {
+                showStatus('❌ Erreur lors de l\'ajout', 'error');
+            }
+        });
+
+        // Supprimer une réservation
+        async function deleteReservation(id) {
+            if (!confirm('Supprimer cette réservation ?')) return;
+
+            try {
+                await fetch(`${API_URL}/reservations/${id}`, { method: 'DELETE' });
+                showStatus('Réservation supprimée', 'success');
+                loadReservations();
+            } catch (err) {
+                showStatus('Erreur lors de la suppression', 'error');
+            }
+        }
+
+        // Afficher un message de statut
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            setTimeout(() => status.className = 'status', 3000);
+        }
+
+        // Charger au démarrage
+        loadReservations();
+        setInterval(loadReservations, 5000);
+    </script>
+</body>
+
+</html>
