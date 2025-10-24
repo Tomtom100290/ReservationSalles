@@ -13,5 +13,8 @@
         "jest": "^30.2.0",
         "pg": "^8.11.0",
         "supertest": "^7.1.4"
+    },
+    "devDependencies": {
+        "wait-on": "^9.0.1"
     }
 }
