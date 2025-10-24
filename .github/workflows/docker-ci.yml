@@ -22,9 +22,13 @@ jobs:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3️⃣ Construire l’image Docker
+      # 3️⃣ Construire l’image Docker pour le Frontend
       - name: Build Docker image
-        run: docker build -t myapp:latest .
+        run: docker build -t myapp:latest -f frontend/Dockerfile ./frontend
+
+      # 3️⃣ Construire l’image Docker pour le Backend
+      - name: Build Docker image
+        run: docker build -t myapp:latest -f backend/Dockerfile ./backend
 
       # 4️⃣ (Optionnel) Lancer des tests
       - name: Run tests
