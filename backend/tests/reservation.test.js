@@ -2,41 +2,46 @@
 const request = require('supertest');
 const waitOn = require('wait-on');
 const { Pool } = require('pg');
-const app = require('../app'); // <-- si ton app est dans app.js
-// ou : const app = require('../server'); si tu exportes app depuis server.js
+const app = require('../app');
 
-// ⚙️ Config temporaire de la DB pour tests
-const testPool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://testuser:testpass@localhost:5432/testdb',
-});
+// 🧩 Détection du contexte
+const isCI = !!process.env.CI;
+const DB_HOST = isCI ? 'localhost' : 'db';
+const DB_PORT = 5432;
+
+// 🔗 Chaîne de connexion dynamique
+const DATABASE_URL =
+    process.env.DATABASE_URL ||
+    (isCI
+        ? `postgresql://testuser:testpass@${DB_HOST}:${DB_PORT}/testdb`
+        : `postgresql://admin:password123@${DB_HOST}:${DB_PORT}/reservations`);
+
+const testPool = new Pool({ connectionString: DATABASE_URL });
 
 describe('🧪 Tests API /api/reservations', () => {
     let reservationId;
 
-    // 💡 Avant TOUS les tests
     beforeAll(async () => {
-        console.log('⏳ Attente de PostgreSQL...');
-        await waitOn({ resources: ['tcp:localhost:5432'], timeout: 30000 }); // attend 30 secondes max
+        console.log(`⏳ Attente de PostgreSQL sur ${DB_HOST}:${DB_PORT}...`);
+        await waitOn({ resources: [`tcp:${DB_HOST}:${DB_PORT}`], timeout: 60000 }); // 60s max
+        console.log('✅ PostgreSQL prêt');
 
-        console.log('✅ PostgreSQL prêt, initialisation de la base...');
         await testPool.query(`
-        CREATE TABLE IF NOT EXISTS reservations (
+      CREATE TABLE IF NOT EXISTS reservations (
         id SERIAL PRIMARY KEY,
         salle VARCHAR(100) NOT NULL,
         nom VARCHAR(100) NOT NULL,
         date DATE NOT NULL,
         heure VARCHAR(10) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+      );
     `);
-    }, 30000); // timeout Jest augmenté à 30s pour ce hook
+    }, 60000); // ← timeout Jest étendu à 60 secondes
 
-    // Nettoyer après chaque test
     afterEach(async () => {
         await testPool.query('DELETE FROM reservations');
     });
 
-    // Fermer la connexion DB
     afterAll(async () => {
         await testPool.end();
     });
@@ -55,10 +60,7 @@ describe('🧪 Tests API /api/reservations', () => {
             heure: '10:00',
         };
 
-        const res = await request(app)
-            .post('/api/reservations')
-            .send(newReservation);
-
+        const res = await request(app).post('/api/reservations').send(newReservation);
         expect(res.statusCode).toBe(201);
         expect(res.body.salle).toBe('Salle Test');
         reservationId = res.body.id;
