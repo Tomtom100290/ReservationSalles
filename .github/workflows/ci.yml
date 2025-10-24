@@ -39,6 +39,17 @@ jobs:
         working-directory: backend
         run: npm install
 
+      - name: ⏳ Wait for PostgreSQL
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U testuser; then
+              echo "✅ PostgreSQL is ready"
+              break
+            fi
+            echo "⏳ Waiting for PostgreSQL... ($i/30)"
+            sleep 2
+          done
+
       - name: 🧪 Run Backend tests
         working-directory: backend
         env:
