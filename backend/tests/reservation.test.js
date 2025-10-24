@@ -1,54 +1,45 @@
+// backend/tests/reservation.test.js
 const request = require('supertest');
+const waitOn = require('wait-on');
 const { Pool } = require('pg');
 
-// Configuration de la connexion pour les tests
-const testPool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://testuser:testpass@localhost:5432/testdb'
-});
+// ✅ Importer ton app Express (pas le serveur !)
+const app = require('../app'); // <-- si ton app est dans app.js
+// ou : const app = require('../server'); si tu exportes app depuis server.js
 
-// Import de l'app - IMPORTANT: importer après avoir configuré la DB
-const { app } = require('../server.js');
+// ⚙️ Config temporaire de la DB pour tests
+const testPool = new Pool({
+    connectionString: process.env.DATABASE_URL || 'postgresql://testuser:testpass@localhost:5432/testdb',
+});
 
 describe('🧪 Tests API /api/reservations', () => {
     let reservationId;
 
+    // 💡 Avant TOUS les tests
     beforeAll(async () => {
-        // Attendre que PostgreSQL soit prêt
-        let retries = 5;
-        while (retries > 0) {
-            try {
-                await testPool.query('SELECT 1');
-                console.log('✅ Connexion PostgreSQL établie');
-                break;
-            } catch (err) {
-                retries--;
-                console.log(`⏳ Attente PostgreSQL... (${retries} essais restants)`);
-                if (retries === 0) throw err;
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-        }
+        console.log('⏳ Attente de PostgreSQL...');
+        await waitOn({ resources: ['tcp:localhost:5432'], timeout: 30000 }); // attend 30 secondes max
 
-        // Créer la table si elle n'existe pas
+        console.log('✅ PostgreSQL prêt, initialisation de la base...');
         await testPool.query(`
-            CREATE TABLE IF NOT EXISTS reservations (
-                id SERIAL PRIMARY KEY,
-                salle VARCHAR(100) NOT NULL,
-                nom VARCHAR(100) NOT NULL,
-                date DATE NOT NULL,
-                heure VARCHAR(10) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        console.log('✅ Table reservations créée/vérifiée');
-    });
+      CREATE TABLE IF NOT EXISTS reservations (
+        id SERIAL PRIMARY KEY,
+        salle VARCHAR(100) NOT NULL,
+        nom VARCHAR(100) NOT NULL,
+        date DATE NOT NULL,
+        heure VARCHAR(10) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    }, 30000); // timeout Jest augmenté à 30s pour ce hook
 
+    // Nettoyer après chaque test
     afterEach(async () => {
-        // Nettoyer après chaque test
         await testPool.query('DELETE FROM reservations');
     });
 
+    // Fermer la connexion DB
     afterAll(async () => {
-        // Fermer la connexion
         await testPool.end();
     });
 
@@ -63,7 +54,7 @@ describe('🧪 Tests API /api/reservations', () => {
             salle: 'Salle Test',
             nom: 'Alice',
             date: '2025-10-25',
-            heure: '10:00'
+            heure: '10:00',
         };
 
         const res = await request(app)
@@ -76,20 +67,7 @@ describe('🧪 Tests API /api/reservations', () => {
     });
 
     it('DELETE /api/reservations/:id → 200', async () => {
-        // D'abord créer une réservation
-        const createRes = await request(app)
-            .post('/api/reservations')
-            .send({
-                salle: 'Salle Test',
-                nom: 'Bob',
-                date: '2025-10-26',
-                heure: '14:00'
-            });
-
-        const id = createRes.body.id;
-
-        // Puis la supprimer
-        const res = await request(app).delete(`/api/reservations/${id}`);
+        const res = await request(app).delete(`/api/reservations/${reservationId}`);
         expect(res.statusCode).toBe(200);
         expect(res.body.message).toBe('Réservation supprimée');
     });

@@ -70,7 +70,7 @@ if (require.main === module) {
     const PORT = 3000;
 
     // Initialiser la DB après 3 secondes seulement en mode normal
-    setTimeout(initDB, 3000);
+    //setTimeout(initDB, 3000);
 
     app.listen(PORT, () => {
         console.log(`🚀 Backend démarré sur le port ${PORT}`);
