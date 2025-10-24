@@ -31,8 +31,12 @@ jobs:
         run: docker build -t myapp:latest -f backend/Dockerfile ./backend
 
       # 4️⃣ (Optionnel) Lancer des tests
-      - name: Run tests
-        run: docker run --rm myapp:latest pytest  # adapte cette commande à ton projet
+      - name: Run frontend tests
+        run: docker run --rm myapp-frontend:latest npm test  
+      
+      # 4️⃣ (Optionnel) Lancer des tests
+      - name: Run backend tests
+        run: docker run --rm myapp-backend:latest pytest 
 
       # 5️⃣ (Optionnel) Pousser l’image
       # - name: Push image to Docker Hub
