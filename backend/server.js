@@ -30,9 +30,6 @@ async function initDB() {
     }
 }
 
-// Attendre que la DB soit prête
-setTimeout(initDB, 3000);
-
 // Routes API
 app.get('/api/reservations', async (req, res) => {
     try {
@@ -65,7 +62,17 @@ app.delete('/api/reservations/:id', async (req, res) => {
     }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Backend démarré sur le port ${PORT}`);
-});
+// Exporter l'app et les utilitaires
+module.exports = { app, pool, initDB };
+
+// Démarrer le serveur SEULEMENT si ce fichier est exécuté directement
+if (require.main === module) {
+    const PORT = 3000;
+
+    // Initialiser la DB après 3 secondes seulement en mode normal
+    setTimeout(initDB, 3000);
+
+    app.listen(PORT, () => {
+        console.log(`🚀 Backend démarré sur le port ${PORT}`);
+    });
+}
