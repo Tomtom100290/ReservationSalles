@@ -62,6 +62,12 @@ jobs:
       - name: ✅ Backend build success
         run: echo "✅ Backend tests and build passed!"
 
+      - name: 📦 Install Backend dependencies
+        working-directory: backend
+        run: |
+          npm install
+          npm install --save-dev wait-on
+
   # Job pour tester et builder le Frontend
   frontend:
     runs-on: ubuntu-latest

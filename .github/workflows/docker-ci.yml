@@ -42,7 +42,7 @@ jobs:
 
       - name: 🧪 Lancer les tests
         env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+          DATABASE_URL: postgresql://admin:password123@postgres:5432/reservations
           NODE_ENV: test
         run: npm test
 
