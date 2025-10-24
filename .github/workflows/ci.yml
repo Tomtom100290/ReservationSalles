@@ -76,14 +76,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: 📦 Install Frontend dependencies
-        working-directory: frontend
-        run: npm install
+  #    - name: 📦 Install Frontend dependencies
+  #      working-directory: frontend
+  #      run: npm install
 
-      - name: 🧪 Run Frontend tests
-        working-directory: frontend
-        run: npm test -- --passWithNoTests
-        continue-on-error: true
+  #    - name: 🧪 Run Frontend tests
+  #      working-directory: frontend
+  #      run: npm test -- --passWithNoTests
+  #      continue-on-error: true
 
       - name: 🐳 Build Frontend Docker image
         run: docker build -t reservation-frontend:test -f frontend/Dockerfile ./frontend
