@@ -2,9 +2,8 @@ name: Docker CI/CD - Reservation App
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*.*.*'
 
 jobs:
   # Job pour tester et builder le Backend
