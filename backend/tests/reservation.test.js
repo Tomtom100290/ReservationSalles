@@ -2,7 +2,8 @@
 const request = require('supertest');
 const waitOn = require('wait-on');
 const { Pool } = require('pg');
-const faker = require('@faker-js/faker').faker;
+//const faker = require('@faker-js/faker').faker;
+const faker = require('@faker-js/faker');
 const app = require('../app'); // ton app Express
 
 // Détecter l'environnement CI (GitHub Actions) ou local Docker
