@@ -19,7 +19,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://admin:password123@db:5432/reservations
+      DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
     depends_on:
       - db
     networks:
