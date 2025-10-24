@@ -2,8 +2,6 @@
 const request = require('supertest');
 const waitOn = require('wait-on');
 const { Pool } = require('pg');
-
-// ✅ Importer ton app Express (pas le serveur !)
 const app = require('../app'); // <-- si ton app est dans app.js
 // ou : const app = require('../server'); si tu exportes app depuis server.js
 
@@ -22,7 +20,7 @@ describe('🧪 Tests API /api/reservations', () => {
 
         console.log('✅ PostgreSQL prêt, initialisation de la base...');
         await testPool.query(`
-      CREATE TABLE IF NOT EXISTS reservations (
+        CREATE TABLE IF NOT EXISTS reservations (
         id SERIAL PRIMARY KEY,
         salle VARCHAR(100) NOT NULL,
         nom VARCHAR(100) NOT NULL,
